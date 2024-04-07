@@ -1,11 +1,20 @@
-def userEntity(item) -> dict:
-    return {
-        "id": str(item["_id"]),
-        "name": item["name"],
-        "email": item["email"],
-        "password": item["password"]
-    }
+from pydantic import BaseModel
 
 
-def usersEntity(entity) -> list:
-    return [userEntity(item) for item in entity]
+class CommonUser(BaseModel):
+    user: str
+    password: str
+    email: str
+    name: str
+
+
+class UserRead(CommonUser):
+    id: str
+
+
+class UserCreate(CommonUser):
+    ...
+
+
+class UserUpdate(CommonUser):
+    ...

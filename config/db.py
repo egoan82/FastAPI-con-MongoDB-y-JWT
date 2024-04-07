@@ -5,9 +5,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-url = "mongodb+srv://%s:%s@cluster0.m8gyh.mongodb.net/?retryWrites=true&w=majority" % (
-    getenv("MONGO_USER"),
-    getenv("MONGO_PASSWORD")
-)
+host_db = getenv("MONGO_HOST")
+port_db = getenv("MONGO_PORT")
+user_db = getenv("MONGO_USER")
+password_db = getenv("MONGO_PASSWORD")
 
-conn = MongoClient(url, tlsCAFile=certifi.where())
+url = f"mongodb://{user_db}:{password_db}@{host_db}:{port_db}"
+
+conn = MongoClient(url)
+conn.database = conn.users

@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.responses import JSONResponse
@@ -6,37 +7,38 @@ from datetime import datetime, timedelta
 from os import getenv
 
 security = HTTPBearer()
+load_dotenv()
 
 
 def expired_token(exp: int):
     date = datetime.now()
     new_date = date + timedelta(hours=exp)
-    print(date)
-    print(new_date)
     return new_date
 
 
 def generate_token(data: dict, expires_delta: timedelta | None = None):
+    expire_minutes = getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+    secret_token = getenv("SECRET_TOKEN")
+    algorithm_token = getenv("ALGORITHM_TOKEN")
+
     to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=float(expire_minutes))
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=float(getenv("ACCESS_TOKEN_EXPIRE_MINUTES")))
 
-    print(datetime.utcnow())
-    print(expire)
     to_encode.update({"exp": expire})
-    encoded_jwt = encode(to_encode, getenv(
-        "SECRET_TOKEN"), algorithm=getenv("ALGORITHM_TOKEN"))
-    return encoded_jwt
+    return encode(to_encode, secret_token, algorithm=algorithm_token)
 
 
 def validate_token(token, output=False):
+    secret_token = getenv("SECRET_TOKEN")
+    algorithm_token = getenv("ALGORITHM_TOKEN")
     try:
         if output:
-            return decode(token, key=getenv("SECRET_TOKEN"), algorithms=getenv("ALGORITHM_TOKEN"))
-        decode(token, key=getenv("SECRET_TOKEN"),
-               algorithms=getenv("ALGORITHM_TOKEN"))
+            return decode(token, key=secret_token, algorithms=algorithm_token)
+        decode(token, key=secret_token, algorithms=algorithm_token)
+        return JSONResponse(
+            content={"message": "Token valid"}, status_code=status.HTTP_200_OK)
     except exceptions.DecodeError:
         return JSONResponse(
             content={"message": "Token invalid"}, status_code=status.HTTP_401_UNAUTHORIZED)
