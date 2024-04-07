@@ -2,6 +2,10 @@
 
 I want to share this simple example of how we can use FastApi to connect with MongoDB and add security to our endpoints with the help of JWT. As a virtual environment I am using [Poetry](https://python-poetry.org/)
 
+In this example I am generating the ids of the documents by uuid type code, which allows me to have greater control over the identifiers.
+
+![Example register](images/example.png)
+
 ## Packages
 For this project I have used the following packages
 
